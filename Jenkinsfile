@@ -1,12 +1,11 @@
-node{
-    checkout scm;
-    stage('listing'){
-        sh 'ls'
+node {
+    stage('Build Docker Image') {
+        sh 'docker build -t devops-jenkinsserver .'
     }
-    stage('list all'){
-        sh 'ls -al'
-    }
-    stage('Display'){
-        sh 'cat index.html'
+
+    stage('Publish to DockerHub') {
+        withDockerRegistry([credentialsId: 'dockerhub_credentials', url: 'https://registry.hub.docker.com']) {
+            sh 'docker push devops-jenkinsserver:latest'
+        }
     }
 }
