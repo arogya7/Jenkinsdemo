@@ -1,11 +1,29 @@
-node {
-    stage('Build Docker Image') {
-        sh 'docker build -t devops-jenkinsserver .'
-    }
-
-    stage('Publish to DockerHub') {
-        withDockerRegistry([credentialsId: 'dockerhub_credentials', url: 'https://registry.hub.docker.com']) {
-            sh 'docker push devops-jenkinsserver:latest'
+pipeline {
+    agent any
+    
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build('devops-jenkinsserver')
+                }
+            }
+        }
+        stage('Push to Dockerhub') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub_credentials') {
+                        docker.image('devops-jenkinsserver').push('latest')
+                    }
+                }
+            }
+        }
+        stage('Display Dockerhub Content') {
+            steps {
+                script {
+                    sh 'docker search devops-jenkinsserver'
+                }
+            }
         }
     }
 }
