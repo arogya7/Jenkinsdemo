@@ -1,9 +1,13 @@
-FROM nginx:latest
+FROM ubuntu:latest
 
-MAINTAINER sophiya.maharjan@metahorizon.com
+RUN apt-get update && apt-get install -y nginx
 
-EXPOSE 80
+RUN apt-get install -y gnupg2 && \
+    wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | apt-key add - && \
+    sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list' && \
+    apt-get update && \
+    apt-get install -y jenkins
 
-COPY default.conf /etc/nginx/conf.d/
-COPY . /usr/share/nginx/html/
+EXPOSE 80 8080
 
+CMD service nginx start && service jenkins start && tail -f /dev/null
